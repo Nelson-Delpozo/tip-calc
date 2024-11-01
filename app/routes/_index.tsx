@@ -1,8 +1,9 @@
 // app/routes/index.tsx
 import React, { useState } from "react";
 
-import BartenderInput from "~/components/BartenderInput";
-import TipCalculationDisplay from "~/components/TipCalculationDisplay";
+//correct imports
+import BartenderInput from "../components/BartenderInput";
+import TipCalculationDisplay from"../components/TipCalculationDisplay";
 
 export default function Index() {
   // Initialize state with two default bartenders and empty input fields
