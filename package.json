@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "npm run build",
+    "build": "remix build",
     "dev": "remix dev -c \"npm run dev:serve\"",
     "dev:serve": "remix-serve ./build/index.js",
     "format": "prettier --write .",
