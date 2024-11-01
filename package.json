@@ -4,12 +4,11 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "prisma generate && npm run build",
+    "build": "npm run build",
     "dev": "remix dev -c \"npm run dev:serve\"",
     "dev:serve": "NODE_OPTIONS=\"--import ./mocks/index.js\" remix-serve ./build/index.js",
     "format": "prettier --write .",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
-    "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "start": "remix-serve ./build/index.js",
     "start:mocks": "NODE_OPTIONS=\"--import ./mocks/index.js\" remix-serve ./build/index.js",
     "test": "vitest",
@@ -25,7 +24,6 @@
     "/public/build"
   ],
   "dependencies": {
-    "@prisma/client": "^5.20.0",
     "@remix-run/css-bundle": "^2.13.1",
     "@remix-run/node": "^2.13.1",
     "@remix-run/react": "^2.13.1",
@@ -72,7 +70,6 @@
     "postcss": "^8.4.47",
     "prettier": "3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
-    "prisma": "^5.20.0",
     "start-server-and-test": "^2.0.8",
     "tailwindcss": "^3.4.13",
     "tsx": "^4.19.1",
@@ -83,8 +80,5 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   }
 }
