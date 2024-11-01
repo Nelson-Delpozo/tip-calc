@@ -1,118 +1,213 @@
 // app/routes/index.tsx
-import { useState } from "react";
+import React, { useState } from "react";
 
-import BartenderInput from "../components/BartenderInput";
-import TipCalculationDisplay from "../components/TipCalculationDisplay";
+import BartenderInput from "~/components/BartenderInput";
+import TipCalculationDisplay from "~/components/TipCalculationDisplay";
 
 export default function Index() {
-  // State for total cash tips, bartenders, and display of results
-  const [cashTips, setCashTips] = useState<number>(0);
-  const [bartenders, setBartenders] = useState([{ name: "", creditTips: 0 }]);
+  // Initialize state with two default bartenders and empty input fields
+  const [bartenders, setBartenders] = useState([
+    { name: "", creditTips: "" },
+    { name: "", creditTips: "" },
+  ]);
+  const [cashTips, setCashTips] = useState<string>(""); // Empty string for cashTips input
   const [isCalculated, setIsCalculated] = useState(false);
-  interface CalculationResult {
+  interface Result {
     busserTipOut: number;
-    perBartenderShare: number;
-    calculations: {
+    busserTipOutSource: string;
+    targetShare: number;
+    bartenderBalances: {
       name: string;
       creditTips: number;
-      owesBusser: number;
-      zelleAmount: number;
+      cashReceived: number;
+      zelleReceived: number;
+      zelleSent: number;
+      finalShare: number;
+      adjustmentNeeded: number;
+    }[];
+    zelleTransfers: {
+      from: string;
+      to: string;
+      amount: number;
     }[];
   }
 
-  const [results, setResults] = useState<CalculationResult | null>(null);
+  const [results, setResults] = useState<Result | null>(null);
 
-  // Handle cash tips input
   const handleCashTipsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCashTips(parseFloat(e.target.value) || 0);
+    setCashTips(e.target.value);
   };
 
-  // Handle adding a new bartender
   const addBartender = () => {
-    setBartenders([...bartenders, { name: "", creditTips: 0 }]);
+    setBartenders([...bartenders, { name: "", creditTips: "" }]);
   };
 
-  // Handle removing a bartender by index
   const removeBartender = (index: number) => {
     setBartenders(bartenders.filter((_, i) => i !== index));
   };
 
-  // Update bartender information
-  const updateBartender = (index: number, name: string, creditTips: number) => {
+  const updateBartender = (index: number, name: string, creditTips: string) => {
     const updatedBartenders = bartenders.map((bartender, i) =>
-      i === index ? { name, creditTips } : bartender
+      i === index ? { name, creditTips } : bartender,
     );
     setBartenders(updatedBartenders);
   };
 
-  // Handle form submission to calculate tips distribution
   const handleCalculate = () => {
-    if (bartenders.some((b) => b.name === "" || b.creditTips < 0)) {
-      alert("Please fill out all bartender names and valid credit tip amounts.");
+    // Convert cashTips and creditTips to numbers for calculations, defaulting to 0 if empty
+    const parsedCashTips = parseFloat(cashTips) || 0;
+    const parsedBartenders = bartenders.map((b) => ({
+      name: b.name,
+      creditTips: parseFloat(b.creditTips) || 0,
+    }));
+
+    if (parsedBartenders.some((b) => b.name === "" || b.creditTips < 0)) {
+      alert(
+        "Please fill out all bartender names and valid credit tip amounts.",
+      );
       return;
     }
 
-    // Total tips including cash and credit
-    const totalTips = cashTips + bartenders.reduce((sum, b) => sum + b.creditTips, 0);
+    const totalTips =
+      parsedCashTips +
+      parsedBartenders.reduce((sum, b) => sum + b.creditTips, 0);
     const busserTipOut = totalTips * 0.1;
     const distributableTips = totalTips - busserTipOut;
-    const perBartenderShare = distributableTips / bartenders.length;
+    const targetShare = distributableTips / parsedBartenders.length;
 
-    const calculations = bartenders.map((bartender) => {
-      const difference = perBartenderShare - bartender.creditTips;
-      return {
-        ...bartender,
-        owesBusser: bartender === bartenders[0] ? busserTipOut : 0,
-        zelleAmount: difference,
-      };
+    const bartenderBalances = parsedBartenders.map((bartender) => ({
+      name: bartender.name,
+      creditTips: bartender.creditTips,
+      cashReceived: 0,
+      zelleReceived: 0,
+      zelleSent: 0,
+      finalShare: bartender.creditTips,
+      adjustmentNeeded: targetShare - bartender.creditTips,
+    }));
+
+    let remainingCashTips = parsedCashTips;
+    let busserTipOutSource = "Cash";
+
+    // Allocate cash tips first for busser tip-out, then to bartenders
+    if (remainingCashTips >= busserTipOut) {
+      remainingCashTips -= busserTipOut;
+    } else {
+      busserTipOutSource = `${parsedBartenders[0].name} via Zelle`;
+      bartenderBalances[0].zelleSent += busserTipOut;
+      bartenderBalances[0].finalShare -= busserTipOut;
+    }
+
+    // Distribute remaining cash tips to help bartenders reach the target share
+    bartenderBalances.forEach((bartender) => {
+      if (remainingCashTips > 0 && bartender.adjustmentNeeded > 0) {
+        const cashContribution = Math.min(
+          bartender.adjustmentNeeded,
+          remainingCashTips,
+        );
+        bartender.cashReceived = cashContribution;
+        bartender.finalShare += cashContribution;
+        bartender.adjustmentNeeded -= cashContribution;
+        remainingCashTips -= cashContribution;
+      }
+    });
+
+    const zelleTransfers: { from: string; to: string; amount: number }[] = [];
+
+    // Adjust any remaining discrepancies using Zelle transfers
+    const overpaidBartenders = bartenderBalances.filter(
+      (b) => b.finalShare > targetShare,
+    );
+    const underpaidBartenders = bartenderBalances.filter(
+      (b) => b.finalShare < targetShare,
+    );
+
+    overpaidBartenders.forEach((overpaid) => {
+      let surplus = overpaid.finalShare - targetShare;
+
+      underpaidBartenders.forEach((underpaid) => {
+        if (surplus <= 0) return;
+
+        const needed = targetShare - underpaid.finalShare;
+        const amountToTransfer = Math.min(surplus, needed);
+
+        if (amountToTransfer > 0) {
+          zelleTransfers.push({
+            from: overpaid.name,
+            to: underpaid.name,
+            amount: amountToTransfer,
+          });
+
+          overpaid.finalShare -= amountToTransfer;
+          overpaid.zelleSent += amountToTransfer;
+
+          underpaid.finalShare += amountToTransfer;
+          underpaid.zelleReceived += amountToTransfer;
+
+          surplus -= amountToTransfer;
+        }
+      });
     });
 
     setResults({
       busserTipOut,
-      perBartenderShare,
-      calculations,
+      busserTipOutSource,
+      targetShare,
+      bartenderBalances,
+      zelleTransfers,
     });
     setIsCalculated(true);
   };
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Bartender Tip Split Calculator</h1>
-      
-      {/* Input for total cash tips */}
-      <label htmlFor="cashTips" className="block mb-2">Total Cash Tips:</label>
+      <h1 className="mb-4 text-2xl font-bold">Michelle the App</h1>
+
+      <label htmlFor="cashTips" className="mb-2 block">
+        Cash in the Bucket:
+      </label>
       <input
         id="cashTips"
         type="number"
         value={cashTips}
         onChange={handleCashTipsChange}
-        className="border px-2 py-1 mb-4 w-full"
+        className="mb-4 w-full border px-2 py-1"
+        placeholder="Enter cash tips"
       />
 
-      {/* Dynamic list of bartender inputs */}
+      {/* Render each BartenderInput for each entry in bartenders */}
       {bartenders.map((bartender, index) => (
         <BartenderInput
           key={index}
           index={index}
           name={bartender.name}
           creditTips={bartender.creditTips}
-          updateBartender={updateBartender}
+          updateBartender={(index, name, creditTips) =>
+            updateBartender(index, name, creditTips.toString())
+          }
           removeBartender={() => removeBartender(index)}
+          inputRef={React.createRef<HTMLInputElement>()}
         />
       ))}
 
-      {/* Add another bartender button */}
-      <button onClick={addBartender} className="bg-blue-500 text-white px-2 py-1 mb-4">
-        Add Another Bartender
-      </button>
+      <div className="mb-4 flex space-x-4">
+        <button
+          onClick={addBartender}
+          className="bg-blue-500 px-4 py-2 text-white"
+        >
+          Add Another Flan-mate
+        </button>
 
-      {/* Calculate button */}
-      <button onClick={handleCalculate} className="bg-green-500 text-white px-4 py-2">
-        Calculate Distribution
-      </button>
+        <button
+          onClick={handleCalculate}
+          className="bg-green-500 px-4 py-2 text-white"
+        >
+          See What&apos;s Up
+        </button>
+      </div>
 
-      {/* Display results after calculation */}
-      {isCalculated && results ? <TipCalculationDisplay results={results} /> : null}
+      {isCalculated && results ? (
+        <TipCalculationDisplay results={results} />
+      ) : null}
     </div>
   );
 }

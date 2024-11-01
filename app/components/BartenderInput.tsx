@@ -4,9 +4,10 @@ import React from "react";
 interface BartenderInputProps {
   index: number;
   name: string;
-  creditTips: number;
-  updateBartender: (index: number, name: string, creditTips: number) => void;
+  creditTips: string | number; // Allow both string and number
+  updateBartender: (index: number, name: string, creditTips: string | number) => void;
   removeBartender: () => void;
+  inputRef: React.RefObject<HTMLInputElement>;
 }
 
 const BartenderInput: React.FC<BartenderInputProps> = ({
@@ -15,6 +16,7 @@ const BartenderInput: React.FC<BartenderInputProps> = ({
   creditTips,
   updateBartender,
   removeBartender,
+  inputRef,
 }) => {
   return (
     <div className="mb-4 border p-4 relative">
@@ -25,6 +27,7 @@ const BartenderInput: React.FC<BartenderInputProps> = ({
         value={name}
         onChange={(e) => updateBartender(index, e.target.value, creditTips)}
         className="border px-2 py-1 mb-2 w-full"
+        ref={inputRef}
       />
 
       <label htmlFor={`creditTips-${index}`} className="block">Credit Card Tips:</label>
@@ -32,7 +35,7 @@ const BartenderInput: React.FC<BartenderInputProps> = ({
         id={`creditTips-${index}`}
         type="number"
         value={creditTips}
-        onChange={(e) => updateBartender(index, name, parseFloat(e.target.value) || 0)}
+        onChange={(e) => updateBartender(index, name, e.target.value)}
         className="border px-2 py-1 w-full"
       />
 
