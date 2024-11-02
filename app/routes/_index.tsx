@@ -93,7 +93,7 @@ export default function Index() {
     if (remainingCashTips >= busserTipOut) {
       remainingCashTips -= busserTipOut;
     } else {
-      busserTipOutSource = `${parsedBartenders[0].name} via Zelle`;
+      busserTipOutSource = `${parsedBartenders[0].name}`;
       bartenderBalances[0].zelleSent += busserTipOut;
       bartenderBalances[0].finalShare -= busserTipOut;
     }
@@ -162,9 +162,9 @@ export default function Index() {
   return (
     <div className="container mx-auto p-4">
 
-
-      <label htmlFor="cashTips" className="mb-2 block">
-        Cash in the Bucket:
+      <div className="mb-4 border p-4 relative flex justify-center items-center">
+      <label htmlFor="cashTips" className="mb-2 block mr-3">
+        Bucket Cash:
       </label>
       <input
         // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -173,9 +173,10 @@ export default function Index() {
         type="number"
         value={cashTips}
         onChange={handleCashTipsChange}
-        className="mb-4 w-full border px-2 py-1 bg-green-50"
+        className="mb-4 border border-green-700 px-2 py-1 bg-green-50"
         placeholder="Enter cash tips"
       />
+      </div>
 
       {/* Render each BartenderInput for each entry in bartenders */}
       {bartenders.map((bartender, index) => (

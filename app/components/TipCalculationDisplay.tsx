@@ -59,7 +59,7 @@ const TipCalculationDisplay: React.FC<TipCalculationDisplayProps> = ({ results }
       )}
 
       {/* Additional Note for Busser Zelle Transfer if applicable */}
-      {results.busserTipOutSource.includes("Zelle") ? <p>
+      {results.busserTipOutSource !== "Cash" ? <p>
           <strong>Note:</strong> {results.busserTipOutSource} is responsible for Zelle-ing <strong>${results.busserTipOut.toFixed(2)}</strong> to the busser.
         </p> : null}
     </div>
