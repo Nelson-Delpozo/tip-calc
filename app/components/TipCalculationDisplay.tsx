@@ -34,7 +34,7 @@ const TipCalculationDisplay: React.FC<TipCalculationDisplayProps> = ({ results }
       <p><strong>Each Bartender&apos;s Target Share After Tip-Out:</strong> ${results.targetShare.toFixed(2)}</p>
 
       {/* Detailed Breakdown for Each Bartender */}
-      <h3 className="mt-4 font-bold">Bartender Shares Breakdown</h3>
+      <h3 className="mt-4 font-bold mb-3">Bartender Shares Breakdown:</h3>
       {results.bartenderBalances.map((bartender, index) => (
         <div key={index} className="mb-4 p-2 border">
           <p><strong>{bartender.name}</strong></p>
