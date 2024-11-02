@@ -9,7 +9,6 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-
 import stylesheet from "./tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -23,11 +22,31 @@ export default function App() {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        ></link>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Freckle+Face&family=Hanalei+Fill&family=Stint+Ultra+Condensed&display=swap"
+          rel="stylesheet"
+        ></link>
         <Meta />
         <Links />
       </head>
       <body className="h-full">
+        <header className="bg-white mb-5">
+          <nav className="container mx-auto flex justify-center items-center p-4">
+            <h2 className="font-freckle text-green-700 text-5xl font-bold">TIP-A-NANIGAN&apos;S</h2>
+          </nav>
+        </header>
         <Outlet />
+        {/* Footer */}
+        <footer className="font-freckle bg-white text-center text-green-700 mb-5">
+          <p className="text-lg">&copy; {new Date().getFullYear()} TIP-A-NANIGAN&apos;S. All rights reserved.</p>
+          <p className="text-lg">for Michelle at Flanigan&apos;s Wellington</p>
+        </footer>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

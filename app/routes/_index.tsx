@@ -161,7 +161,7 @@ export default function Index() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="mb-4 text-2xl font-bold">Michelle the App</h1>
+
 
       <label htmlFor="cashTips" className="mb-2 block">
         Cash in the Bucket:
@@ -193,14 +193,14 @@ export default function Index() {
       <div className="mb-4 flex space-x-4">
         <button
           onClick={addBartender}
-          className="bg-blue-500 px-4 py-2 text-white"
+          className="bg-green-700 px-4 py-2 text-white rounded"
         >
           Add Another Flan-mate
         </button>
 
         <button
           onClick={handleCalculate}
-          className="bg-green-500 px-4 py-2 text-white"
+          className="bg-green-700 px-4 py-2 text-white rounded"
         >
           See What&apos;s Up
         </button>
