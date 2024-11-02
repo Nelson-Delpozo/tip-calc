@@ -190,7 +190,7 @@ export default function Index() {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 border p-4 relative">
-        <label htmlFor="cashTips" className="mb-2 mr-3 block">
+        <label htmlFor="cashTips" className="mb-2 mr-3 block font-semibold">
           Bucket Cash:
         </label>
         <input

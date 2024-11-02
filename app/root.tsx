@@ -44,7 +44,7 @@ export default function App() {
         <Outlet />
         {/* Footer */}
         <footer className="font-freckle bg-green-50 text-center text-green-700">
-          <p className="text-lg">&copy; {new Date().getFullYear()} the TIP-MATE. All rights reserved.</p>
+          <p className="text-lg">&copy; {new Date().getFullYear()} the TIP-MATE. All rights reserved</p>
           <p className="text-lg">for Michelle at Flanigan&apos;s Wellington</p>
         </footer>
         <ScrollRestoration />

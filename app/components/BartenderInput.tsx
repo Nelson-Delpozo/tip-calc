@@ -20,7 +20,7 @@ const BartenderInput: React.FC<BartenderInputProps> = ({
 }) => {
   return (
     <div className="mb-4 border p-4 relative">
-      <label htmlFor={`bartenderName-${index}`} className="block">Bartender Name:</label>
+      <label htmlFor={`bartenderName-${index}`} className="block font-semibold">Bartender Name:</label>
       <input
         id={`bartenderName-${index}`}
         type="text"
@@ -30,7 +30,7 @@ const BartenderInput: React.FC<BartenderInputProps> = ({
         ref={inputRef}
       />
 
-      <label htmlFor={`creditTips-${index}`} className="block">Credit Card Tips:</label>
+      <label htmlFor={`creditTips-${index}`} className="block font-semibold">Credit Card Tips:</label>
       <input
         id={`creditTips-${index}`}
         type="number"
