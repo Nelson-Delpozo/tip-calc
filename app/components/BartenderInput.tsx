@@ -37,6 +37,7 @@ const BartenderInput: React.FC<BartenderInputProps> = ({
         value={creditTips}
         onChange={(e) => updateBartender(index, name, e.target.value)}
         className="border border-green-700 px-2 py-1 w-full bg-green-50"
+        placeholder="$"
       />
 
       {/* Remove button */}

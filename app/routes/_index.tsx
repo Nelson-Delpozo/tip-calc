@@ -164,7 +164,7 @@ export default function Index() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="relative mb-4 flex items-center justify-center border p-4">
+      <div className="mb-4 border p-4 relative">
         <label htmlFor="cashTips" className="mb-2 mr-3 block">
           Bucket Cash:
         </label>
@@ -175,8 +175,8 @@ export default function Index() {
           type="number"
           value={cashTips}
           onChange={handleCashTipsChange}
-          className="mb-4 border border-green-700 bg-green-50 px-2 py-1"
-          placeholder="Enter cash tips"
+          className="mb-4 border w-full border-green-700 bg-green-50 px-2 py-1"
+          placeholder="$"
         />
       </div>
 
