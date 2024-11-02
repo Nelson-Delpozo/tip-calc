@@ -167,11 +167,13 @@ export default function Index() {
         Cash in the Bucket:
       </label>
       <input
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus
         id="cashTips"
         type="number"
         value={cashTips}
         onChange={handleCashTipsChange}
-        className="mb-4 w-full border px-2 py-1"
+        className="mb-4 w-full border px-2 py-1 bg-green-50"
         placeholder="Enter cash tips"
       />
 

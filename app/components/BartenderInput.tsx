@@ -26,7 +26,7 @@ const BartenderInput: React.FC<BartenderInputProps> = ({
         type="text"
         value={name}
         onChange={(e) => updateBartender(index, e.target.value, creditTips)}
-        className="border px-2 py-1 mb-2 w-full"
+        className="border px-2 py-1 mb-2 w-full bg-green-50"
         ref={inputRef}
       />
 
@@ -36,13 +36,13 @@ const BartenderInput: React.FC<BartenderInputProps> = ({
         type="number"
         value={creditTips}
         onChange={(e) => updateBartender(index, name, e.target.value)}
-        className="border px-2 py-1 w-full"
+        className="border px-2 py-1 w-full bg-green-50"
       />
 
       {/* Remove button */}
       <button
         onClick={removeBartender}
-        className="absolute top-2 right-2 text-red-500"
+        className="absolute top-2 right-2 text-red-800 font-bold"
       >
         ×
       </button>
