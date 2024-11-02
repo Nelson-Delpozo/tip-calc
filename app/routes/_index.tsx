@@ -25,6 +25,7 @@ export default function Index() {
       zelleSent: number;
       finalShare: number;
       adjustmentNeeded: number;
+      zelleToBusser: number;
     }[];
     zelleTransfers: {
       from: string;
@@ -62,45 +63,55 @@ export default function Index() {
       name: b.name,
       creditTips: parseFloat(b.creditTips) || 0,
     }));
-
+  
     // Validation
     if (parsedBartenders.some((b) => b.name === "" || b.creditTips < 0)) {
       setErrorMessage("I need bartenders names bruh");
       return;
     }
-
+  
     // Clear error message if validation passes
     setErrorMessage("");
-
+  
     const totalTips =
       parsedCashTips +
       parsedBartenders.reduce((sum, b) => sum + b.creditTips, 0);
     const busserTipOut = totalTips * 0.1;
     const distributableTips = totalTips - busserTipOut;
     const targetShare = distributableTips / parsedBartenders.length;
-
+  
     const bartenderBalances = parsedBartenders.map((bartender) => ({
       name: bartender.name,
       creditTips: bartender.creditTips,
       cashReceived: 0,
       zelleReceived: 0,
       zelleSent: 0,
+      zelleToBusser: 0, // New property for busser contributions
       finalShare: bartender.creditTips,
       adjustmentNeeded: targetShare - bartender.creditTips,
     }));
-
+  
     let remainingCashTips = parsedCashTips;
     let busserTipOutSource = "Cash";
-
+  
     // Allocate cash tips first for busser tip-out, then to bartenders
     if (remainingCashTips >= busserTipOut) {
       remainingCashTips -= busserTipOut;
     } else {
-      busserTipOutSource = `${parsedBartenders[0].name}`;
-      bartenderBalances[0].zelleSent += busserTipOut;
-      bartenderBalances[0].finalShare -= busserTipOut;
+      busserTipOutSource = "Proportional from Bartenders";
+      const shortfall = busserTipOut - remainingCashTips;
+      remainingCashTips = 0;
+  
+      // Distribute shortfall proportionally among bartenders
+      const totalCreditTips = bartenderBalances.reduce((sum, b) => sum + b.creditTips, 0);
+      bartenderBalances.forEach((bartender) => {
+        const proportion = bartender.creditTips / totalCreditTips;
+        const contribution = shortfall * proportion;
+        bartender.zelleToBusser += contribution;
+        bartender.finalShare -= contribution;
+      });
     }
-
+  
     // Distribute remaining cash tips to help bartenders reach the target share
     bartenderBalances.forEach((bartender) => {
       if (remainingCashTips > 0 && bartender.adjustmentNeeded > 0) {
@@ -114,44 +125,56 @@ export default function Index() {
         remainingCashTips -= cashContribution;
       }
     });
-
+  
     const zelleTransfers: { from: string; to: string; amount: number }[] = [];
-
+  
     // Adjust any remaining discrepancies using Zelle transfers
-    const overpaidBartenders = bartenderBalances.filter(
-      (b) => b.finalShare > targetShare,
-    );
-    const underpaidBartenders = bartenderBalances.filter(
-      (b) => b.finalShare < targetShare,
-    );
-
-    overpaidBartenders.forEach((overpaid) => {
-      let surplus = overpaid.finalShare - targetShare;
-
-      underpaidBartenders.forEach((underpaid) => {
-        if (surplus <= 0) return;
-
-        const needed = targetShare - underpaid.finalShare;
-        const amountToTransfer = Math.min(surplus, needed);
-
-        if (amountToTransfer > 0) {
-          zelleTransfers.push({
-            from: overpaid.name,
-            to: underpaid.name,
-            amount: amountToTransfer,
-          });
-
-          overpaid.finalShare -= amountToTransfer;
-          overpaid.zelleSent += amountToTransfer;
-
-          underpaid.finalShare += amountToTransfer;
-          underpaid.zelleReceived += amountToTransfer;
-
-          surplus -= amountToTransfer;
-        }
+    let isBalanced = false;
+  
+    while (!isBalanced) {
+      // Sort bartenders by adjustment needed or surplus
+      const overpaidBartenders = bartenderBalances
+        .filter((b) => b.finalShare > targetShare)
+        .sort((a, b) => (b.finalShare - targetShare) - (a.finalShare - targetShare));
+  
+      const underpaidBartenders = bartenderBalances
+        .filter((b) => b.finalShare < targetShare)
+        .sort((a, b) => (targetShare - b.finalShare) - (targetShare - a.finalShare));
+  
+      // Assume balanced unless a transfer is required
+      isBalanced = overpaidBartenders.length === 0 || underpaidBartenders.length === 0;
+  
+      overpaidBartenders.forEach((overpaid) => {
+        let surplus = overpaid.finalShare - targetShare;
+  
+        underpaidBartenders.forEach((underpaid) => {
+          if (surplus <= 0) return;
+  
+          const needed = targetShare - underpaid.finalShare;
+          const amountToTransfer = Math.min(surplus, needed);
+  
+          if (amountToTransfer > 0) {
+            zelleTransfers.push({
+              from: overpaid.name,
+              to: underpaid.name,
+              amount: Number(amountToTransfer.toFixed(2)),
+            });
+  
+            overpaid.finalShare -= amountToTransfer;
+            overpaid.zelleSent += amountToTransfer;
+  
+            underpaid.finalShare += amountToTransfer;
+            underpaid.zelleReceived += amountToTransfer;
+  
+            surplus -= amountToTransfer;
+  
+            // If any bartender still needs adjustment, continue the loop
+            isBalanced = false;
+          }
+        });
       });
-    });
-
+    }
+  
     setResults({
       busserTipOut,
       busserTipOutSource,
@@ -161,6 +184,8 @@ export default function Index() {
     });
     setIsCalculated(true);
   };
+  
+  
 
   return (
     <div className="container mx-auto p-4">
