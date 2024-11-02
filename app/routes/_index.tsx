@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 //correct imports
 import BartenderInput from "../components/BartenderInput";
-import TipCalculationDisplay from"../components/TipCalculationDisplay";
+import TipCalculationDisplay from "../components/TipCalculationDisplay";
 
 export default function Index() {
   // Initialize state with two default bartenders and empty input fields
@@ -34,6 +34,7 @@ export default function Index() {
   }
 
   const [results, setResults] = useState<Result | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleCashTipsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCashTips(e.target.value);
@@ -62,12 +63,14 @@ export default function Index() {
       creditTips: parseFloat(b.creditTips) || 0,
     }));
 
+    // Validation
     if (parsedBartenders.some((b) => b.name === "" || b.creditTips < 0)) {
-      alert(
-        "Please fill out all bartender names and valid credit tip amounts.",
-      );
+      setErrorMessage("I need bartenders names bruh");
       return;
     }
+
+    // Clear error message if validation passes
+    setErrorMessage("");
 
     const totalTips =
       parsedCashTips +
@@ -161,21 +164,20 @@ export default function Index() {
 
   return (
     <div className="container mx-auto p-4">
-
-      <div className="mb-4 border p-4 relative flex justify-center items-center">
-      <label htmlFor="cashTips" className="mb-2 block mr-3">
-        Bucket Cash:
-      </label>
-      <input
-        // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus
-        id="cashTips"
-        type="number"
-        value={cashTips}
-        onChange={handleCashTipsChange}
-        className="mb-4 border border-green-700 px-2 py-1 bg-green-50"
-        placeholder="Enter cash tips"
-      />
+      <div className="relative mb-4 flex items-center justify-center border p-4">
+        <label htmlFor="cashTips" className="mb-2 mr-3 block">
+          Bucket Cash:
+        </label>
+        <input
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
+          id="cashTips"
+          type="number"
+          value={cashTips}
+          onChange={handleCashTipsChange}
+          className="mb-4 border border-green-700 bg-green-50 px-2 py-1"
+          placeholder="Enter cash tips"
+        />
       </div>
 
       {/* Render each BartenderInput for each entry in bartenders */}
@@ -193,17 +195,25 @@ export default function Index() {
         />
       ))}
 
+      <div>
+        {errorMessage ? (
+          <div className="font-freckle mb-4 bg-green-50 p-2 text-center text-xl text-green-700">
+            {errorMessage}
+          </div>
+        ) : null}
+      </div>
+
       <div className="mb-4 flex space-x-4">
         <button
           onClick={addBartender}
-          className="bg-green-700 px-4 py-2 text-white rounded"
+          className="rounded bg-green-700 px-4 py-2 text-white"
         >
           Add Another Flan-mate
         </button>
 
         <button
           onClick={handleCalculate}
-          className="bg-green-700 px-4 py-2 text-white rounded"
+          className="rounded bg-green-700 px-4 py-2 text-white"
         >
           See What&apos;s Up
         </button>
