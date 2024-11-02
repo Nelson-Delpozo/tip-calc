@@ -203,7 +203,7 @@ export default function Index() {
         ) : null}
       </div>
 
-      <div className="mb-4 flex space-x-4">
+      <div className="mb-4 flex space-x-4 justify-center">
         <button
           onClick={addBartender}
           className="rounded bg-green-700 px-4 py-2 text-white"

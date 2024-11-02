@@ -38,13 +38,13 @@ export default function App() {
       <body className="h-full bg-green-50">
         <header className="w-full bg-green-50 mb-5">
           <nav className="container mx-auto flex justify-center items-center py-5 max-w-screen-lg">
-            <h2 className="font-freckle text-green-700 text-5xl font-bold">TIP-A-NANIGAN&apos;S</h2>
+            <h2 className="font-freckle text-green-700 text-5xl font-bold">the TIP-MATE</h2>
           </nav>
         </header>
         <Outlet />
         {/* Footer */}
         <footer className="font-freckle bg-green-50 text-center text-green-700">
-          <p className="text-lg">&copy; {new Date().getFullYear()} TIP-A-NANIGAN&apos;S. All rights reserved.</p>
+          <p className="text-lg">&copy; {new Date().getFullYear()} the TIP-MATE. All rights reserved.</p>
           <p className="text-lg">for Michelle at Flanigan&apos;s Wellington</p>
         </footer>
         <ScrollRestoration />
