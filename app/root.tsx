@@ -36,8 +36,8 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full bg-green-50">
-        <header className="bbg-green-50 mb-5">
-          <nav className="container mx-auto flex justify-center items-center p-4">
+        <header className="w-full bg-green-50 mb-5">
+          <nav className="container mx-auto flex justify-center items-center py-5 max-w-screen-lg">
             <h2 className="font-freckle text-green-700 text-5xl font-bold">TIP-A-NANIGAN&apos;S</h2>
           </nav>
         </header>
