@@ -65,8 +65,12 @@ const TipCalculationDisplay: React.FC<TipCalculationDisplayProps> = ({
           </p>
           <p>Credit Tips: ${bartender.creditTips.toFixed(2)}</p>
           <p>Cash Split: ${bartender.cashReceived.toFixed(2)}</p>
-          <p>Zelle from Flan-mate: ${bartender.zelleReceived.toFixed(2)}</p>
-          <p>Zelle to Flan-mate: ${bartender.zelleSent.toFixed(2)}</p>
+          <p>
+            Zelle from {results.zelleTransfers.filter(transfer => transfer.to === bartender.name).length > 1 ? 'Flan-mates' : 'Flan-mate'}: ${bartender.zelleReceived.toFixed(2)}
+          </p>
+          <p>
+            Zelle to {results.zelleTransfers.filter(transfer => transfer.from === bartender.name).length > 1 ? 'Flan-mates' : 'Flan-mate'}: ${bartender.zelleSent.toFixed(2)}
+          </p>
           <p>Zelle to Busser: ${bartender.zelleToBusser.toFixed(2)}</p>
           <p>
             <strong>Shift Total:</strong> ${bartender.finalShare.toFixed(2)}
